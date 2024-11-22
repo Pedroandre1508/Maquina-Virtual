@@ -1,0 +1,53 @@
+correções a serem realizadas
+
+
+ldv, ldi estavam incorretos e o jump estava exibindo 2x seguidas, um com o ? e o outro com o lugar para onde deveria pular, mas o correto seria so exibir um com o valor de onde ele deve pular e não adeve exibir o ?.
+o Jump com ? é apenas temporario, até ele encontrar para onde deve pular, ai quando é encontrado que dai dev e ser exibido na tabela.
+
+
+TESTES GERADOS
+
+make programa
+
+const int: a = 10. real: b = 20. end;
+var int: x, y. real: z. end;
+put(x, y, z).
+end.
+
+
+---------------
+make programa
+
+const int: a = 10. real: b = 20. end;
+var int: x, y. real: z. end;
+
+while a > 5 do
+    if b < 15 then
+        put(x).
+    else
+        put(y).
+    end.
+    .a -> x.
+end.
+.
+end.
+
+------------------
+
+make programa
+
+const int: a = 10. real: b = 20. end;
+var int: x, y. real: z. end;
+
+if a > 5 then
+    if b < 15 then
+        put(x).
+    else
+        put(y).
+    end.
+.
+else
+    put(z).
+end.
+.
+end.
