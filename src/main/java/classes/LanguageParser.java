@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import classes.LanguageParser.SemanticException;
+
 public class LanguageParser implements LanguageParserConstants {
   private int contParseError = 0;
   private final static List<AErrorStruct> output = new ArrayList<AErrorStruct>();
@@ -136,11 +138,13 @@ public class LanguageParser implements LanguageParserConstants {
     } else {
         // Adicionar as instruções geradas na lista de AIntermediateCode
         parser.tabelaInstrucoes.getInstrucoes().forEach(instrucao -> {
-            intermediateCodeList.add(new AIntermediateCode(
+          if (!instrucao.getParametro().equals("?")) {  
+          intermediateCodeList.add(new AIntermediateCode(
                 String.valueOf(instrucao.getNumero()),
                 instrucao.getCodigo(),
                 String.valueOf(instrucao.getParametro())
             ));
+          }
         });
     }
 
