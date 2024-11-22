@@ -1,4 +1,11 @@
-Compilador com analise lexica, sintatica e semantica desenvolvido por Katya e Pedro André - utilizando javaCC
+Maquina virtual com analise lexica, sintatica e semantica desenvolvido por Pedro André - utilizando javaCC
+
+Inicialização do programa pelo programa fonte
+
+Deve ser compilado a classe App.java no caminho:
+
+/src/main/java/gui/App.java
+
 
 Inicialização do programa pelo .jar
 
@@ -9,10 +16,3 @@ Windowns
 Linux
 
 - Deve ser aberto o terminal da parta do .jar e jogado o comando: java -jar nomeDoPrograma.jar
-
-
-Inicialização do programa pelo programa fonte
-
-Deve ser compilado a classe main inicial de todo o programa que é chamada de App.java no caminho:
-
-/src/main/java/gui/App.java
