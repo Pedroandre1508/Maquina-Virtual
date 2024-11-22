@@ -700,8 +700,8 @@ public class SemanticException extends Exception {
       acao4();
       jj_consume_token(IGUAL);
       valor();
-      // verificar
-      acao5(tipo);
+      int constanteInteira = Integer.parseInt(token.image);
+      acao5(constanteInteira);
       jj_consume_token(PONTO);
       constantes_prime();
     } finally {
@@ -1016,7 +1016,8 @@ public class SemanticException extends Exception {
         case CONSTANTE_INTEIRA: {
           jj_consume_token(CONSTANTE_INTEIRA);
           // verificar
-          acao16(tipo);
+          int constanteInteira = Integer.parseInt(token.image);
+          acao16(constanteInteira);
           break;
         }
         case CONSTANTE_REAL: {
@@ -1357,7 +1358,8 @@ public class SemanticException extends Exception {
         case CONSTANTE_INTEIRA: {
           jj_consume_token(CONSTANTE_INTEIRA);
           //verificar
-          acao16(tipo);
+          int constanteInteira = Integer.parseInt(token.image);
+          acao16(constanteInteira);
           break;
         }
         case CONSTANTE_REAL: {
