@@ -318,6 +318,7 @@ public class Controller {
             return;
         }
         
+        //maquinaVirtual();
     }
 
     private boolean hasSemanticErrors() {
