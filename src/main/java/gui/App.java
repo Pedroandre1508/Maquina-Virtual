@@ -11,6 +11,7 @@ public class App extends Application {
     public static void main(String[] args) {
         launch();
     }
+    //aa teste
 
     @Override
     public void start(Stage primaryStage) throws Exception {
