@@ -6,7 +6,7 @@ public class AppMetadataHelper {
     // TODO: Maybe use java propreties here?
     public static List<String> getAuthors() {
         return List.of(
-                "Katya Balvedi", "Pedro Andre"
+             "Pedro André"
         );
     }
 

@@ -33,7 +33,7 @@
                     <MenuItem text="Executar" onAction="#compileProgram"/>
                 </Menu>
                 <Menu text="Versão">
-                    <MenuItem text="0.2 || Autores: Katya Balvedi e Pedro André"/>
+                    <MenuItem text="0.4 Pedro André"/>
                 </Menu>
             </MenuBar>
         </HBox>
