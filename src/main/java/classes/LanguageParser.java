@@ -151,6 +151,28 @@ public class LanguageParser implements LanguageParserConstants {
     return intermediateCodeList;
 }
 
+public static String analisarESexecutar(String input, List<String> semanticErrors) throws ParseException, SemanticException {
+  List<AIntermediateCode> intermediateCodeList = analisadorSemantico(input, semanticErrors);
+
+  if (!semanticErrors.isEmpty()) {
+      StringBuilder sb = new StringBuilder();
+      for (String error : semanticErrors) {
+          sb.append(error).append("\n");
+      }
+      return sb.toString();
+  }
+
+  // Executa a máquina virtual
+  LanguageParser parser = create(input);
+  return parser.executarInstrucoes();
+}
+
+public String executarInstrucoes() {
+  AMaquinaVirtual maquinaVirtual = new AMaquinaVirtual(tabelaInstrucoes, tabelaSimbolos);
+  maquinaVirtual.executar();
+  return maquinaVirtual.exibirPilha();
+}
+
 public class SemanticException extends Exception {
   private int line;
   private int column;
@@ -326,21 +348,25 @@ public class SemanticException extends Exception {
   }
 
   // Ação #12: reconhecimento de identificador em comando de atribuição
-  public void acao12(String identificador) throws SemanticException {
-    if (tabelaSimbolos.contains(identificador)) {
-        Simbolo simbolo = tabelaSimbolos.getSimbolo(identificador);
-        
-        // Verificar se o identificador é um identificador de variável
-        if (simbolo.getCategoria() >= 1 && simbolo.getCategoria() <= 4) { // Tipos 1 a 4 são variáveis
-            gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
-            ponteiro++;
-        } else {
-            semanticErrors.add(new SemanticException("Erro Semantico: identificador de programa ou de constante", token.beginLine, token.beginColumn));
-        }
+public void acao12(String identificador) throws SemanticException {
+  if (tabelaSimbolos.contains(identificador)) {
+    Simbolo simbolo = tabelaSimbolos.getSimbolo(identificador);
+    // Verificar se o identificador é um identificador de variável
+    if (simbolo.getCategoria() >= 1 && simbolo.getCategoria() <= 4) { // Tipos 1 a 4 são variáveis
+      // Verificar compatibilidade de tipos
+      if (tipo == simbolo.getAtributo() || (simbolo.getAtributo() == 2 && tipo == 1)) { // Real pode receber inteiro
+        gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
+        ponteiro++;
+      } else {
+        semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
+      }
     } else {
-        semanticErrors.add(new SemanticException("Erro Semantico: identificador não declarado", token.beginLine, token.beginColumn));
+      semanticErrors.add(new SemanticException("Erro Semantico: identificador de programa ou de constante", token.beginLine, token.beginColumn));
     }
+  } else {
+    semanticErrors.add(new SemanticException("Erro Semantico: identificador não declarado", token.beginLine, token.beginColumn));
   }
+}
 
   // Ação #13: reconhecimento da palavra reservada get
   public void acao13() {
@@ -404,7 +430,10 @@ public class SemanticException extends Exception {
   }
 
   // Ação #21: reconhecimento de expressão em comando de seleção
-  public void acao21() {
+  public void acao21() throws SemanticException {
+    if (tipo != 4) { // Verificar se o tipo é lógico
+      semanticErrors.add(new SemanticException("Erro Semantico: expressão deve ser lógica em comando de seleção", token.beginLine, token.beginColumn));
+    }
     gerarInstrucao(ponteiro, "JMF", "?");
     ponteiro++;
     pilhaDesvios.add(ponteiro - 1);
@@ -442,6 +471,9 @@ public class SemanticException extends Exception {
 
   // Ação #25: reconhecimento de expressão em comando de repetição
   public void acao25() {
+    if (tipo != 4) { // Verificar se o tipo é lógico
+      semanticErrors.add(new SemanticException("Erro Semantico: expressão deve ser lógica em comando de repetição", token.beginLine, token.beginColumn));
+    }
     gerarInstrucao(ponteiro, "JMF", "?");
     ponteiro++;
     pilhaDesvios.add(ponteiro - 1);
@@ -465,6 +497,10 @@ public class SemanticException extends Exception {
 
   // Ação #27: reconhecimento de operação relacional igual
   public void acao27() {
+    if (tipo != 1 && tipo != 2 && tipo != 3 && tipo != 4) { // Verificar se os operandos são de tipos compatíveis
+      semanticErrors.add(new SemanticException("Erro Semantico: operadores relacionais devem ser de tipos compatíveis", token.beginLine, token.beginColumn));
+    }
+    tipo = 4; // O resultado da expressão relacional é lógico  
     gerarInstrucao(ponteiro, "EQL", 0);
     ponteiro++;
   }
@@ -501,6 +537,9 @@ public class SemanticException extends Exception {
 
   // Ação #33: reconhecimento de operação aritmética adição
   public void acao33() {
+    if (tipo != 1 && tipo != 2) { // Verificar se os operandos são inteiros ou reais
+      semanticErrors.add(new SemanticException("Erro Semantico: operadores aritméticos devem ser inteiros ou reais", token.beginLine, token.beginColumn));
+    }
     gerarInstrucao(ponteiro, "ADD", 0);
     ponteiro++;
   }
@@ -513,6 +552,9 @@ public class SemanticException extends Exception {
 
   // Ação #35: reconhecimento de operação lógica OU
   public void acao35() {
+    if (tipo != 4) { // Verificar se os operandos são lógicos
+      semanticErrors.add(new SemanticException("Erro Semantico: operadores lógicos devem ser lógicos", token.beginLine, token.beginColumn));
+    }
     gerarInstrucao(ponteiro, "OR", 0);
     ponteiro++;
   }
@@ -525,6 +567,9 @@ public class SemanticException extends Exception {
 
   // Ação #37: reconhecimento de operação aritmética divisão real
   public void acao37() {
+    if (tipo != 1 && tipo != 2) { // Verificar se os operandos são inteiros ou reais
+      semanticErrors.add(new SemanticException("Erro Semantico: operadores aritméticos devem ser inteiros ou reais", token.beginLine, token.beginColumn));
+    }
     gerarInstrucao(ponteiro, "DIV", 0);
     ponteiro++;
   }
