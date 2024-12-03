@@ -1,5 +1,14 @@
 package gui;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
+
 import classes.AErrorStruct;
 import classes.AIntermediateCode;
 import classes.LanguageParser;
@@ -7,25 +16,26 @@ import classes.LanguageParser.SemanticException;
 import classes.LanguageParserConstants;
 import classes.ParseException;
 import classes.Token;
-import util.AlertFactory;
-import util.Operation;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
-import javafx.scene.control.cell.PropertyValueFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import util.AlertFactory;
+import util.Operation;
 
 public class Controller {
     private EditorFile editorFile = new EditorFile();
@@ -317,7 +327,10 @@ public class Controller {
         if (hasSemanticErrors()) {
             return;
         }
-        
+
+        // Executa a máquina virtual
+        abrirJanelaInteracao();
+        executarMaquinaVirtual(this.inputTextArea.getText());
     }
 
     private boolean hasSemanticErrors() {
@@ -334,7 +347,6 @@ public class Controller {
         String messageContent = this.messageTextArea.getText();
         return messageContent.contains("Erro(s) lexicos encontrados.");
     }
-
 
     private void analisadorLexico() {
         this.messageTextArea.clear();
@@ -406,6 +418,54 @@ public class Controller {
                 this.messageTextArea.appendText("\n" + error + "\n");
             }
         }
+    }
+
+    private void executarMaquinaVirtual(String codigo) throws ParseException, SemanticException {
+        List<String> semanticErrors = new ArrayList<>();
+        String resultado = LanguageParser.analisarESexecutar(codigo, semanticErrors);
+        if (!semanticErrors.isEmpty()) {
+            for (String error : semanticErrors) {
+                this.messageTextArea.appendText("\n" + error + "\n");
+            }
+        } else {
+            exibirResultado(resultado);
+        }
+    }
+
+    private void abrirJanelaInteracao() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("InteractionWindow.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(loader.load()));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Interação com a Máquina Virtual");
+            InteractionController controller = loader.getController();
+            controller.setStage(stage);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int solicitarEntrada() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("InteractionWindow.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(loader.load()));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Entrada de Dados");
+            InteractionController controller = loader.getController();
+            controller.setStage(stage);
+            stage.showAndWait();
+            return controller.getInputValue();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1; // Valor de erro
+        }
+    }
+
+    private void exibirResultado(String resultado) {
+        outputArea.setText(resultado);
     }
 
     // atualiza a tabela de códigos intermediários

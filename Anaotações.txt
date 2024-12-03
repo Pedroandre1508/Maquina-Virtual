@@ -1,10 +1,37 @@
-correções a serem realizadas
+Plano de Implementação
+
+1. Análise Semântica em Tempo de Compilação
+Definir a Tabela de Símbolos:
+
+A tabela de símbolos (ATabelaSimbolos) deve armazenar informações sobre variáveis, constantes e seus tipos.
+Implementar a Análise Semântica:
+
+No LanguageParser, implemente métodos para verificar se as operações são semanticamente corretas.
+Verifique tipos de variáveis, inicializações, e outras regras semânticas.
+Gerar Instruções:
+
+Após a análise semântica, gere as instruções correspondentes e armazene-as na tabela de instruções (ATabelaInstrucoes).
+2. Validação em Tempo de Execução
+Criar a Classe MaquinaVirtual:
+
+Esta classe será responsável por executar as instruções e realizar validações em tempo de execução.
+Adicione métodos para executar cada tipo de instrução (ADD, ALB, ALI, etc.).
+Adicionar Métodos de Validação:
+
+Adicione métodos na MaquinaVirtual para validar tipos e valores durante a execução.
+Exibir Resultados:
+
+Adicione um método para exibir o estado da pilha ou outras informações relevantes após a execução das instruções.
+3. Integração com a Interface Gráfica
+Adicionar Função de Execução no LanguageParser:
+
+Adicione uma função no LanguageParser para executar as instruções e retornar os resultados.
+Chamar a Função de Execução no Controller.java:
+
+No Controller.java, chame a função de execução do LanguageParser e exiba os resultados na interface gráfica.
 
 
-ldv, ldi estavam incorretos e o jump estava exibindo 2x seguidas, um com o ? e o outro com o lugar para onde deveria pular, mas o correto seria so exibir um com o valor de onde ele deve pular e não adeve exibir o ?.
-o Jump com ? é apenas temporario, até ele encontrar para onde deve pular, ai quando é encontrado que dai dev e ser exibido na tabela.
-
-
+----------------------------------------------------------------
 TESTES GERADOS
 
 make programa

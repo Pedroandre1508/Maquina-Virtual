@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.InteractionController">
+    <children>
+        <Label text="HGelo" />
+        <TextField fx:id="inputField" />
+        <Button text="OK" onAction="#handleOkButton" />
+    </children>
+    <padding>
+        <Insets top="100" right="100" bottom="100" left="100"/>
+    </padding>
+</VBox>
