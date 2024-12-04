@@ -17,7 +17,7 @@ public class AMaquinaVirtual {
         this.tabelaSimbolos = tabelaSimbolos;
         this.ponteiro = 0;
         this.pilha = new int[100]; // Tamanho da pilha pode ser ajustado conforme necessário
-        this.topo = -1;
+        this.topo = 0;
         this.controller = controller;
     }
 

@@ -333,7 +333,6 @@ public class Controller {
         // Executa a máquina virtual
         abrirJanelaInteracao();
         executarMaquinaVirtual(this.inputTextArea.getText());
-        abrirJanelaInteracao();
     }
 
     private boolean hasSemanticErrors() {
