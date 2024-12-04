@@ -302,7 +302,7 @@ public class AMaquinaVirtual {
     }
     private void executarWRT() {
         String mensagem = String.valueOf(pilha[topo]);
-        controller.exibirMensagem(mensagem);
+        controller.exibirMensagem(mensagem.toString().trim());
         topo--;
         ponteiro++;
     }

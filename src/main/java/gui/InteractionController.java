@@ -1,7 +1,8 @@
 package gui;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
@@ -9,21 +10,32 @@ import javafx.stage.Stage;
 public class InteractionController {
 
     @FXML
-    private TextField inputField;
+    private TextArea messageTextArea;
 
     @FXML
-    private Label messageLabel;
+    private TextField inputTextField;
+
+    @FXML
+    private Button sendButton;
 
     private Stage stage;
     private String inputValue;
 
     public void initialize() {
         // Adiciona um manipulador de eventos para a tecla "Enter" no campo de texto
-        inputField.setOnKeyPressed(event -> {
+        inputTextField.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
-                handleEnterKey();
+                handleSendButton();
             }
         });
+
+        // Adiciona um listener para monitorar mudanças no texto do campo de entrada
+        inputTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            sendButton.setDisable(newValue.trim().isEmpty());
+        });
+
+        // Inicialmente, desabilita o botão de envio
+        sendButton.setDisable(true);
     }
 
     public void setStage(Stage stage) {
@@ -35,16 +47,17 @@ public class InteractionController {
     }
 
     public void setMessage(String message) {
-        messageLabel.setText(messageLabel.getText() + "\n" + message);
+        messageTextArea.appendText("\n" + message);
     }
 
     public void enableInputField(boolean enable) {
-        inputField.setDisable(!enable);
+        inputTextField.setDisable(!enable);
     }
 
-    private void handleEnterKey() {
-        inputValue = inputField.getText();
-        inputField.clear();
+    @FXML
+    private void handleSendButton() {
+        inputValue = inputTextField.getText();
+        inputTextField.clear();
         synchronized (this) {
             this.notify();
         }

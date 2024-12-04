@@ -445,13 +445,16 @@ public class Controller {
                 interactionController = loader.getController();
                 interactionController.setStage(interactionStage);
             }
-            interactionStage.show();
+            if (!interactionStage.isShowing()) {
+                interactionStage.show();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public int solicitarEntrada() {
+        abrirJanelaInteracao();
         interactionController.enableInputField(true);
         synchronized (interactionController) {
             try {
@@ -465,6 +468,7 @@ public class Controller {
     }
 
     public void exibirMensagem(String mensagem) {
+        //abrirJanelaInteracao();
         interactionController.setMessage(mensagem);
     }
 
