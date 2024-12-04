@@ -6,13 +6,12 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.InteractionController">
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.InteractionController" style="-fx-background-color: black;" prefWidth="600" prefHeight="400">
     <children>
-        <Label text="HGelo" />
-        <TextField fx:id="inputField" />
-        <Button text="OK" onAction="#handleOkButton" />
+        <Label fx:id="messageLabel" text="" style="-fx-text-fill: white;"/>
+        <TextField fx:id="inputField" style="-fx-text-fill: white; -fx-background-color: black;"/>
     </children>
     <padding>
-        <Insets top="100" right="100" bottom="100" left="100"/>
+        <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
 </VBox>

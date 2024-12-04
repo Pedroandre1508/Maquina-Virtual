@@ -3,7 +3,6 @@ package classes;
 import java.util.List;
 
 import gui.Controller;
-import javafx.application.Platform;
 
 public class AMaquinaVirtual {
     private ATabelaInstrucoes tabelaInstrucoes;
@@ -13,7 +12,7 @@ public class AMaquinaVirtual {
     private int topo;
     private Controller controller;
 
-    public AMaquinaVirtual(ATabelaInstrucoes tabelaInstrucoes, ATabelaSimbolos tabelaSimbolos) {
+    public AMaquinaVirtual(ATabelaInstrucoes tabelaInstrucoes, ATabelaSimbolos tabelaSimbolos, Controller controller) {
         this.tabelaInstrucoes = tabelaInstrucoes;
         this.tabelaSimbolos = tabelaSimbolos;
         this.ponteiro = 0;
@@ -119,6 +118,9 @@ public class AMaquinaVirtual {
             case "WRT":
                 executarWRT();
                 break;
+            case "STC":
+            executarSTC((int) instrucao.getParametro());
+            break;
             default:
                 throw new RuntimeException("Instrução desconhecida: " + instrucao.getCodigo());
         }
@@ -266,15 +268,6 @@ public class AMaquinaVirtual {
         ponteiro++;
     }
 
-    private void executarREA() {
-        Platform.runLater(() -> {
-            int valor = controller.solicitarEntrada();
-            pilha[++topo] = valor;
-            ponteiro++;
-            executar(); // Continue a execução após a entrada do usuário
-        });
-    }
-
     private void executarSME() {
         pilha[topo - 1] = (pilha[topo - 1] <= pilha[topo]) ? 1 : 0;
         topo--;
@@ -302,8 +295,23 @@ public class AMaquinaVirtual {
         ponteiro++;
     }
 
+    private void executarREA() {
+        int valor = controller.solicitarEntrada();
+        pilha[++topo] = valor;
+        ponteiro++;
+    }
     private void executarWRT() {
-        System.out.println(pilha[topo--]);
+        String mensagem = String.valueOf(pilha[topo]);
+        controller.exibirMensagem(mensagem);
+        topo--;
+        ponteiro++;
+    }
+
+    private void executarSTC(int deslocamento) {
+        for (int i = topo - deslocamento; i <= topo - 1; i++) {
+            pilha[i] = pilha[topo];
+        }
+        topo--;
         ponteiro++;
     }
 

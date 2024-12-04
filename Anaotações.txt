@@ -1,34 +1,9 @@
-Plano de Implementação
+*Ajustar tela nova de interação com o usuário, fazer o REA pegar a resposta do ussuário.
+Ajustar para identificar o valor de declaração de constante e variaveis com valor real, não esta identificando o valor real como 1.5
+- Quando declarado um real asssim: real: a = 1.2 ele para depois da analise lexica
+- Quando declarado um char asssim: char: a = 'teste'
 
-1. Análise Semântica em Tempo de Compilação
-Definir a Tabela de Símbolos:
-
-A tabela de símbolos (ATabelaSimbolos) deve armazenar informações sobre variáveis, constantes e seus tipos.
-Implementar a Análise Semântica:
-
-No LanguageParser, implemente métodos para verificar se as operações são semanticamente corretas.
-Verifique tipos de variáveis, inicializações, e outras regras semânticas.
-Gerar Instruções:
-
-Após a análise semântica, gere as instruções correspondentes e armazene-as na tabela de instruções (ATabelaInstrucoes).
-2. Validação em Tempo de Execução
-Criar a Classe MaquinaVirtual:
-
-Esta classe será responsável por executar as instruções e realizar validações em tempo de execução.
-Adicione métodos para executar cada tipo de instrução (ADD, ALB, ALI, etc.).
-Adicionar Métodos de Validação:
-
-Adicione métodos na MaquinaVirtual para validar tipos e valores durante a execução.
-Exibir Resultados:
-
-Adicione um método para exibir o estado da pilha ou outras informações relevantes após a execução das instruções.
-3. Integração com a Interface Gráfica
-Adicionar Função de Execução no LanguageParser:
-
-Adicione uma função no LanguageParser para executar as instruções e retornar os resultados.
-Chamar a Função de Execução no Controller.java:
-
-No Controller.java, chame a função de execução do LanguageParser e exiba os resultados na interface gráfica.
+Realizar os testes de tipos para validar o que funciona e o que não funciona.
 
 
 ----------------------------------------------------------------

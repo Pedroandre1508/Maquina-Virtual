@@ -38,6 +38,8 @@ import util.AlertFactory;
 import util.Operation;
 
 public class Controller {
+    private Stage interactionStage;
+    private InteractionController interactionController;
     private EditorFile editorFile = new EditorFile();
     private static boolean hasEditedFile = false;
     private static boolean hasOpenFile = false;
@@ -331,11 +333,12 @@ public class Controller {
         // Executa a máquina virtual
         abrirJanelaInteracao();
         executarMaquinaVirtual(this.inputTextArea.getText());
+        abrirJanelaInteracao();
     }
 
     private boolean hasSemanticErrors() {
         String messageContent = this.messageTextArea.getText();
-        return messageContent.contains("Erro Semantico encontrado");
+        return messageContent.contains("Erro Semantico");
     }
 
     private boolean hasSyntaxErrors() {
@@ -434,34 +437,36 @@ public class Controller {
 
     private void abrirJanelaInteracao() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("InteractionWindow.fxml"));
-            Stage stage = new Stage();
-            stage.setScene(new Scene(loader.load()));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Interação com a Máquina Virtual");
-            InteractionController controller = loader.getController();
-            controller.setStage(stage);
-            stage.show();
+            if (interactionStage == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("InteractionWindow.fxml"));
+                interactionStage = new Stage();
+                interactionStage.setScene(new Scene(loader.load()));
+                interactionStage.initModality(Modality.APPLICATION_MODAL);
+                interactionStage.setTitle("Interação com a Máquina Virtual");
+                interactionController = loader.getController();
+                interactionController.setStage(interactionStage);
+            }
+            interactionStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public int solicitarEntrada() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("InteractionWindow.fxml"));
-            Stage stage = new Stage();
-            stage.setScene(new Scene(loader.load()));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Entrada de Dados");
-            InteractionController controller = loader.getController();
-            controller.setStage(stage);
-            stage.showAndWait();
-            return controller.getInputValue();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return -1; // Valor de erro
+        interactionController.enableInputField(true);
+        synchronized (interactionController) {
+            try {
+                interactionController.wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
+        interactionController.enableInputField(false);
+        return Integer.parseInt(interactionController.getInputValue());
+    }
+
+    public void exibirMensagem(String mensagem) {
+        interactionController.setMessage(mensagem);
     }
 
     private void exibirResultado(String resultado) {

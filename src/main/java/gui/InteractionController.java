@@ -1,7 +1,9 @@
 package gui;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 public class InteractionController {
@@ -9,26 +11,42 @@ public class InteractionController {
     @FXML
     private TextField inputField;
 
+    @FXML
+    private Label messageLabel;
+
     private Stage stage;
-    private int inputValue;
+    private String inputValue;
+
+    public void initialize() {
+        // Adiciona um manipulador de eventos para a tecla "Enter" no campo de texto
+        inputField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                handleEnterKey();
+            }
+        });
+    }
 
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
-    public int getInputValue() {
+    public String getInputValue() {
         return inputValue;
     }
 
-    @FXML
-    private void handleOkButton() {
-        try {
-            inputValue = Integer.parseInt(inputField.getText());
-            stage.close();
-        } catch (NumberFormatException e) {
-            // Handle invalid input
-            inputField.setText("");
-            inputField.setPromptText("Por favor, insira um número inteiro.");
+    public void setMessage(String message) {
+        messageLabel.setText(messageLabel.getText() + "\n" + message);
+    }
+
+    public void enableInputField(boolean enable) {
+        inputField.setDisable(!enable);
+    }
+
+    private void handleEnterKey() {
+        inputValue = inputField.getText();
+        inputField.clear();
+        synchronized (this) {
+            this.notify();
         }
     }
 }
