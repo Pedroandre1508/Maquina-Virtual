@@ -48,7 +48,7 @@ public class InteractionController {
     }
 
     public void setMessage(String message) {
-        messageTextArea.appendText("\n" + message);
+        messageTextArea.appendText(" " + message);
     }
 
     public void enableInputField(boolean enable) {

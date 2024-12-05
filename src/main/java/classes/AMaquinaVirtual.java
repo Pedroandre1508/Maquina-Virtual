@@ -289,7 +289,7 @@ public class AMaquinaVirtual {
     }
 
     private void executarSTP() {
-        String mensagem = "Programa finalizado com sucesso";
+        String mensagem = "\n" +"----------------------" + "\n" + "Programa finalizado com sucesso";
         controller.exibirMensagem(mensagem);
         isRunning = false; // Parar a execução
     }
