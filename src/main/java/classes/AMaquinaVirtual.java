@@ -11,6 +11,7 @@ public class AMaquinaVirtual {
     private int[] pilha;
     private int topo;
     private Controller controller;
+    private boolean isRunning; // Variável de controle para parar a execução
 
     public AMaquinaVirtual(ATabelaInstrucoes tabelaInstrucoes, ATabelaSimbolos tabelaSimbolos, Controller controller) {
         this.tabelaInstrucoes = tabelaInstrucoes;
@@ -19,12 +20,14 @@ public class AMaquinaVirtual {
         this.pilha = new int[100]; // Tamanho da pilha pode ser ajustado conforme necessário
         this.topo = 0;
         this.controller = controller;
+        this.isRunning = true; // Inicializa como true
     }
 
     public void executar() {
         List<Instrucao> instrucoes = tabelaInstrucoes.getInstrucoes();
-        while (ponteiro < instrucoes.size()) {
+        while (ponteiro < instrucoes.size() && isRunning) {
             Instrucao instrucao = instrucoes.get(ponteiro);
+            System.out.println("Executando instrução: " + instrucao.getCodigo());
             executarInstrucao(instrucao);
         }
     }
@@ -119,8 +122,8 @@ public class AMaquinaVirtual {
                 executarWRT();
                 break;
             case "STC":
-            executarSTC((int) instrucao.getParametro());
-            break;
+                executarSTC((int) instrucao.getParametro());
+                break;
             default:
                 throw new RuntimeException("Instrução desconhecida: " + instrucao.getCodigo());
         }
@@ -286,7 +289,9 @@ public class AMaquinaVirtual {
     }
 
     private void executarSTP() {
-        System.exit(0); // Finaliza a execução
+        String mensagem = "Programa finalizado com sucesso";
+        controller.exibirMensagem(mensagem);
+        isRunning = false; // Parar a execução
     }
 
     private void executarSUB() {
@@ -300,6 +305,7 @@ public class AMaquinaVirtual {
         pilha[++topo] = valor;
         ponteiro++;
     }
+
     private void executarWRT() {
         String mensagem = String.valueOf(pilha[topo]);
         controller.exibirMensagem(mensagem.toString().trim());

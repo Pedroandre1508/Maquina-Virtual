@@ -40,6 +40,7 @@ import util.Operation;
 public class Controller {
     private Stage interactionStage;
     private InteractionController interactionController;
+    private boolean isInteractionControllerInitialized = false; // Variável de controle
     private EditorFile editorFile = new EditorFile();
     private static boolean hasEditedFile = false;
     private static boolean hasOpenFile = false;
@@ -329,9 +330,6 @@ public class Controller {
         if (hasSemanticErrors()) {
             return;
         }
-
-        // Executa a máquina virtual
-        abrirJanelaInteracao();
         executarMaquinaVirtual(this.inputTextArea.getText());
     }
 
@@ -444,6 +442,9 @@ public class Controller {
                 interactionStage.setTitle("Interação com a Máquina Virtual");
                 interactionController = loader.getController();
                 interactionController.setStage(interactionStage);
+                setInteractionController(interactionController);
+                isInteractionControllerInitialized = true; // Marcar como inicializado
+                System.out.println("InteractionController inicializado.");
             }
             if (!interactionStage.isShowing()) {
                 interactionStage.show();
@@ -454,7 +455,6 @@ public class Controller {
     }
 
     public int solicitarEntrada() {
-        abrirJanelaInteracao();
         interactionController.enableInputField(true);
         synchronized (interactionController) {
             try {
@@ -463,13 +463,34 @@ public class Controller {
                 Thread.currentThread().interrupt();
             }
         }
+        if (!isInteractionControllerInitialized) {
+            abrirJanelaInteracao(); // Inicializar se não estiver inicializado
+        }
         interactionController.enableInputField(false);
+        
+        int valor = Integer.parseInt(interactionController.getInputValue());
+        System.out.println("Valor lido: " + valor);
         return Integer.parseInt(interactionController.getInputValue());
     }
 
     public void exibirMensagem(String mensagem) {
-        //abrirJanelaInteracao();
-        interactionController.setMessage(mensagem);
+        if (!isInteractionControllerInitialized) {
+            abrirJanelaInteracao(); // Inicializar se não estiver inicializado
+        }
+        if (interactionController != null) {
+            interactionController.setMessage(mensagem);
+        } else {
+            System.err.println("InteractionController não inicializado.");
+        }
+    }
+
+    public void setInteractionController(InteractionController interactionController) {
+        this.interactionController = interactionController;
+    }
+
+    public InteractionController getInteracionController (InteractionController interactionController) {
+        this.interactionController = interactionController;
+        return this.interactionController;
     }
 
     private void exibirResultado(String resultado) {
