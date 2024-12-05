@@ -57,6 +57,10 @@ public class InteractionController {
     @FXML
     private void handleSendButton() {
         inputValue = inputTextField.getText();
+        if (inputValue.isEmpty()) {
+            return;
+        }
+        setMessage(inputValue);
         inputTextField.clear();
         synchronized (this) {
             this.notify();
