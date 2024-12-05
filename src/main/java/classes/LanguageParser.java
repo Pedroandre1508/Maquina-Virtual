@@ -265,17 +265,24 @@ public class LanguageParser implements LanguageParserConstants {
 
     // Ação #5: reconhecimento de valor na declaração de constante
     public void acao5(int valor) {
-        switch (tipo) {
-            case 5:
-                gerarInstrucao(ponteiro, "LDI", valor);
-                break;
-            case 6:
-                gerarInstrucao(ponteiro, "LDR", valor);
-                break;
-            case 7:
-                gerarInstrucao(ponteiro, "LDS", valor);
-                break;
-        }
+        gerarInstrucao(ponteiro, "LDI", valor);
+        ponteiro++;
+        gerarInstrucao(ponteiro, "STC", VP);
+        ponteiro++;
+        VP = 0;
+    }
+
+    public void acao5(double valor) {
+        gerarInstrucao(ponteiro, "LDR", valor);
+        ponteiro++;
+        gerarInstrucao(ponteiro, "STC", VP);
+        ponteiro++;
+        VP = 0;
+    }
+
+    public void acao5(String valor) {
+        gerarInstrucao(ponteiro, "LDS", valor);
+
         ponteiro++;
         gerarInstrucao(ponteiro, "STC", VP);
         ponteiro++;
@@ -753,9 +760,6 @@ public class LanguageParser implements LanguageParserConstants {
             acao4();
             jj_consume_token(IGUAL);
             valor();
-            //ajustar para pegar valor real também
-            int constanteInteira = Integer.parseInt(token.image);
-            acao5(constanteInteira);
             jj_consume_token(PONTO);
             constantes_prime();
         } finally {
@@ -1479,14 +1483,20 @@ public class LanguageParser implements LanguageParserConstants {
             switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
                 case CONSTANTE_INTEIRA: {
                     jj_consume_token(CONSTANTE_INTEIRA);
+                    int constante = Integer.parseInt(token.image);
+                    acao5(constante);
                     break;
                 }
                 case CONSTANTE_REAL: {
                     jj_consume_token(CONSTANTE_REAL);
+                    double constante = Double.parseDouble(token.image);
+                    acao5(constante);
                     break;
                 }
                 case CONSTANTE_LITERAL: {
                     jj_consume_token(CONSTANTE_LITERAL);
+                    String constante = String.valueOf(token.image);
+                    acao5(constante);
                     break;
                 }
                 case TRUE: {

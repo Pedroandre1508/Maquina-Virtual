@@ -8,7 +8,7 @@ public class AMaquinaVirtual {
     private ATabelaInstrucoes tabelaInstrucoes;
     private ATabelaSimbolos tabelaSimbolos;
     private int ponteiro;
-    private int[] pilha;
+    private Object[] pilha;
     private int topo;
     private Controller controller;
     private boolean isRunning; // Variável de controle para parar a execução
@@ -17,7 +17,7 @@ public class AMaquinaVirtual {
         this.tabelaInstrucoes = tabelaInstrucoes;
         this.tabelaSimbolos = tabelaSimbolos;
         this.ponteiro = 0;
-        this.pilha = new int[100]; // Tamanho da pilha pode ser ajustado conforme necessário
+        this.pilha = new Object[100]; // Tamanho da pilha pode ser ajustado conforme necessário
         this.topo = 0;
         this.controller = controller;
         this.isRunning = true; // Inicializa como true
@@ -86,10 +86,10 @@ public class AMaquinaVirtual {
                 executarLDI((int) instrucao.getParametro());
                 break;
             case "LDR":
-                executarLDR((int) instrucao.getParametro());
+                executarLDR((double) instrucao.getParametro());
                 break;
             case "LDS":
-                executarLDS((int) instrucao.getParametro());
+                executarLDS((String) instrucao.getParametro());
                 break;
             case "MUL":
                 executarMUL();
@@ -132,7 +132,7 @@ public class AMaquinaVirtual {
     // Implementação das instruções
 
     private void executarADD() {
-        pilha[topo - 1] = pilha[topo - 1] + pilha[topo];
+        pilha[topo - 1] = (int) pilha[topo - 1] + (int) pilha[topo];
         topo--;
         ponteiro++;
     }
@@ -170,19 +170,19 @@ public class AMaquinaVirtual {
     }
 
     private void executarAND() {
-        pilha[topo - 1] = (pilha[topo - 1] != 0 && pilha[topo] != 0) ? 1 : 0;
+        pilha[topo - 1] = ((int) pilha[topo - 1] != 0 && (int) pilha[topo] != 0) ? 1 : 0;
         topo--;
         ponteiro++;
     }
 
     private void executarBGE() {
-        pilha[topo - 1] = (pilha[topo - 1] >= pilha[topo]) ? 1 : 0;
+        pilha[topo - 1] = ((int) pilha[topo - 1] >= (int) pilha[topo]) ? 1 : 0;
         topo--;
         ponteiro++;
     }
 
     private void executarBGR() {
-        pilha[topo - 1] = (pilha[topo - 1] > pilha[topo]) ? 1 : 0;
+        pilha[topo - 1] = ((int) pilha[topo - 1] > (int) pilha[topo]) ? 1 : 0;
         topo--;
         ponteiro++;
     }
@@ -194,11 +194,11 @@ public class AMaquinaVirtual {
     }
 
     private void executarDIV() {
-        if (pilha[topo] == 0) {
+        if ((int) pilha[topo] == 0) {
             System.out.println("RUNTIME error: divisão por 0");
             System.exit(1);
         }
-        pilha[topo - 1] = pilha[topo - 1] / pilha[topo];
+        pilha[topo - 1] = (int) pilha[topo - 1] / (int) pilha[topo];
         topo--;
         ponteiro++;
     }
@@ -210,7 +210,7 @@ public class AMaquinaVirtual {
     }
 
     private void executarJMF(int endereco) {
-        if (pilha[topo--] == 0) {
+        if ((int) pilha[topo--] == 0) {
             ponteiro = endereco;
         } else {
             ponteiro++;
@@ -222,7 +222,7 @@ public class AMaquinaVirtual {
     }
 
     private void executarJMT(int endereco) {
-        if (pilha[topo--] != 0) {
+        if ((int)pilha[topo--] != 0) {
             ponteiro = endereco;
         } else {
             ponteiro++;
@@ -244,41 +244,41 @@ public class AMaquinaVirtual {
         ponteiro++;
     }
 
-    private void executarLDR(int constante) {
+    private void executarLDR(double constante) {
         pilha[++topo] = constante;
         ponteiro++;
     }
 
-    private void executarLDS(int constante) {
+    private void executarLDS(String constante) {
         pilha[++topo] = constante;
         ponteiro++;
     }
 
     private void executarMUL() {
-        pilha[topo - 1] = pilha[topo - 1] * pilha[topo];
+        pilha[topo - 1] = (int)pilha[topo - 1] * (int)pilha[topo];
         topo--;
         ponteiro++;
     }
 
     private void executarNOT() {
-        pilha[topo] = (pilha[topo] == 0) ? 1 : 0;
+        pilha[topo] = ((int)pilha[topo] == 0) ? 1 : 0;
         ponteiro++;
     }
 
     private void executarOR() {
-        pilha[topo - 1] = (pilha[topo - 1] != 0 || pilha[topo] != 0) ? 1 : 0;
+        pilha[topo - 1] = ((int)pilha[topo - 1] != 0 || (int)pilha[topo] != 0) ? 1 : 0;
         topo--;
         ponteiro++;
     }
 
     private void executarSME() {
-        pilha[topo - 1] = (pilha[topo - 1] <= pilha[topo]) ? 1 : 0;
+        pilha[topo - 1] = ((int)pilha[topo - 1] <= (int)pilha[topo]) ? 1 : 0;
         topo--;
         ponteiro++;
     }
 
     private void executarSMR() {
-        pilha[topo - 1] = (pilha[topo - 1] < pilha[topo]) ? 1 : 0;
+        pilha[topo - 1] = ((int)pilha[topo - 1] < (int)pilha[topo]) ? 1 : 0;
         topo--;
         ponteiro++;
     }
@@ -295,7 +295,7 @@ public class AMaquinaVirtual {
     }
 
     private void executarSUB() {
-        pilha[topo - 1] = pilha[topo - 1] - pilha[topo];
+        pilha[topo - 1] = (int)pilha[topo - 1] - (int)pilha[topo];
         topo--;
         ponteiro++;
     }
