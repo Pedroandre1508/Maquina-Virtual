@@ -753,6 +753,7 @@ public class LanguageParser implements LanguageParserConstants {
             acao4();
             jj_consume_token(IGUAL);
             valor();
+            //ajustar para pegar valor real também
             int constanteInteira = Integer.parseInt(token.image);
             acao5(constanteInteira);
             jj_consume_token(PONTO);

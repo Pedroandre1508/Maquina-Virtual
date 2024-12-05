@@ -1,7 +1,10 @@
 *Ajustar tela nova de interação com o usuário, fazer o REA pegar a resposta do ussuário.
 Ajustar para identificar o valor de declaração de constante e variaveis com valor real, não esta identificando o valor real como 1.5
+
+identificado que não reconhece ainda as outras constantes porque ele atribui a ação 5 apenas inteiros, ai por isso que da erro, tem que ajustar para aceitar qualquer valor de declaração conforme o seu tipo
 - Quando declarado um real asssim: real: a = 1.2 ele para depois da analise lexica
 - Quando declarado um char asssim: char: a = 'teste'
+
 
 Realizar os testes de tipos para validar o que funciona e o que não funciona.
 

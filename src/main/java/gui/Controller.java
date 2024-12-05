@@ -455,6 +455,7 @@ public class Controller {
     }
 
     public int solicitarEntrada() {
+        //ARRUMAR PARA SOLICITAR ENTRADA DE DADO
         interactionController.enableInputField(true);
         synchronized (interactionController) {
             try {
