@@ -365,38 +365,26 @@ public void acao12(String identificador) throws SemanticException {
         // Verificar se o identificador é um identificador de variável
         if (simbolo.getCategoria() > 0 && simbolo.getCategoria() < 5) { // Tipos 1 a 4 variavel 
             // Verificar compatibilidade de tipos
+            if (!verificarCompatibilidade(simbolo.getCategoria(), tipoAtribuicao)) {
+                semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
+                return;
+            }
             switch (simbolo.getCategoria()) {
                 case 1: // Inteiro
-                    if (simbolo.getCategoria() == 1) { // Atribuição de inteiro
-                        gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
-                        ponteiro++;
-                    } else {
-                        semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
-                    }
+                    gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
+                    ponteiro++;
                     break;
                 case 2: // Real
-                    if (simbolo.getCategoria() == 1 || simbolo.getCategoria() == 2) { // Atribuição de inteiro ou real
-                        gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
-                        ponteiro++;
-                    } else {
-                        semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
-                    }
+                    gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
+                    ponteiro++;
                     break;
                 case 3: // Literal
-                    if (simbolo.getCategoria() == 3) { // Atribuição de literal
-                        gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
-                        ponteiro++;
-                    } else {
-                        semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
-                    }
+                    gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
+                    ponteiro++;
                     break;
                 case 4: // Booleano
-                    if (simbolo.getCategoria() == 4) { // Atribuição de booleano
-                        gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
-                        ponteiro++;
-                    } else {
-                        semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
-                    }
+                    gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
+                    ponteiro++;
                     break;
                 default:
                     semanticErrors.add(new SemanticException("Erro Semantico: tipo desconhecido", token.beginLine, token.beginColumn));
@@ -654,20 +642,15 @@ public void acao12(String identificador) throws SemanticException {
         tabelaInstrucoes.adicionarInstrucao(ponteiro, instrucao, operando);
     }
 
-    private boolean verificarCompatibilidade(int tipoAtribuicao) {
-        // Verificar se o tipo do token é compatível com o tipo da atribuição
-        switch (tipoAtribuicao) {
-            case 1: // Inteiro
-                return token.kind == CONSTANTE_INTEIRA;
-            case 2: // Real
-                return token.kind == CONSTANTE_REAL;
-            case 3: // Literal
-                return token.kind == CONSTANTE_LITERAL;
-            case 4: // Booleano
-                return token.kind == TRUE || token.kind == FALSE;
-            default:
-                return false;
+    private boolean verificarCompatibilidade(int tipoSimbolo, int tipoAtribuicao) {
+        // Verificar se o tipo do símbolo é compatível com o tipo da atribuição
+        if (tipoSimbolo == tipoAtribuicao) {
+            return true;
         }
+        if (tipoSimbolo == 2 && tipoAtribuicao == 1) { // Real pode receber inteiro
+            return true;
+        }
+        return false;
     }
 
     // Analisador Sintatico
@@ -1453,6 +1436,8 @@ public void acao12(String identificador) throws SemanticException {
         }
     }
 
+    private int tipoAtribuicao; // Variável para armazenar o tipo do símbolo trazido na função elemento()
+
     final public void elemento() throws ParseException, SemanticException {
         trace_call("elemento");
         try {
@@ -1463,7 +1448,7 @@ public void acao12(String identificador) throws SemanticException {
                     if (simbolo == null) {
                         throw new SemanticException("Símbolo não declarado: " + token.image, token.beginLine, token.beginColumn);
                     }
-                    //verificar
+                    tipoAtribuicao = simbolo.getAtributo(); // Armazenar o tipo do símbolo
                     acao15(token.image);
                     break;
                 }
@@ -1471,9 +1456,7 @@ public void acao12(String identificador) throws SemanticException {
                     jj_consume_token(CONSTANTE_INTEIRA);
                     int constanteInteira = Integer.parseInt(token.image);
                     // Verificar compatibilidade de tipos
-                    if (!verificarCompatibilidade(1)) {
-                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado inteiro mas encontrado " + token.image, token.beginLine, token.beginColumn);
-                    }
+                    tipoAtribuicao = 1; // Tipo inteiro
                     acao16(constanteInteira);
                     break;
                 }
@@ -1481,9 +1464,8 @@ public void acao12(String identificador) throws SemanticException {
                     jj_consume_token(CONSTANTE_REAL);
                     double constanteReal = Double.parseDouble(token.image);
                     // Verificar compatibilidade de tipos
-                    if (!verificarCompatibilidade(2)) {
-                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado real mas encontrado " + token.image, token.beginLine, token.beginColumn);
-                    }
+                    tipoAtribuicao = 2; // Tipo real
+
                     acao17(constanteReal);
                     break;
                 }
@@ -1491,25 +1473,22 @@ public void acao12(String identificador) throws SemanticException {
                     jj_consume_token(CONSTANTE_LITERAL);
                     String constanteLiteral = token.image;
                     // Verificar compatibilidade de tipos
-                    if (!verificarCompatibilidade(3)) {
-                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado literal mas encontrado " + token.image, token.beginLine, token.beginColumn);
-                    }
+                    tipoAtribuicao = 3; // Tipo literal
+
                     acao18(constanteLiteral);
                     break;
                 }
                 case TRUE: {
                     jj_consume_token(TRUE);
-                    if (!verificarCompatibilidade(4)) {
-                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado booleano mas encontrado " + token.image, token.beginLine, token.beginColumn);
-                    }
+                    tipoAtribuicao = 4; // Tipo booleano
+
                     acao19();
                     break;
                 }
                 case FALSE: {
                     jj_consume_token(FALSE);
-                    if (!verificarCompatibilidade(4)) {
-                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado booleano mas encontrado " + token.image, token.beginLine, token.beginColumn);
-                    }
+                    tipoAtribuicao = 4; // Tipo booleano
+
                     acao20();
                     break;
                 }
