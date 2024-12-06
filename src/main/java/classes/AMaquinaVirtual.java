@@ -70,10 +70,10 @@ public class AMaquinaVirtual {
                 executarEQL();
                 break;
             case "JMF":
-                executarJMF((int) instrucao.getParametro());
+                executarJMF(instrucao.getParametro());
                 break;
             case "JMP":
-                executarJMP((int) instrucao.getParametro());
+                executarJMP(instrucao.getParametro());
                 break;
             case "JMT":
                 executarJMT((int) instrucao.getParametro());
@@ -82,7 +82,7 @@ public class AMaquinaVirtual {
                 executarLDV((int) instrucao.getParametro());
                 break;
             case "LDB":
-                executarLDB((int) instrucao.getParametro());
+                executarLDB((Object) instrucao.getParametro());
                 break;
             case "LDI":
                 executarLDI((int) instrucao.getParametro());
@@ -266,18 +266,38 @@ public class AMaquinaVirtual {
         ponteiro++;
     }
 
-    private void executarJMF(int endereco) {
-        if ((int) pilha[topo--] == 0) {
-            ponteiro = endereco;
-        } else {
+    private void executarJMF(Object parametro) {
+        if (parametro instanceof Integer) {
+            int endereco = (Integer) parametro;
+            Object valor = pilha[topo--];
+            if (valor instanceof Integer && (Integer) valor == 0) {
+                ponteiro = endereco;
+            } else if (valor instanceof Boolean && !(Boolean) valor) {
+                ponteiro = endereco;
+            } else {
+                ponteiro++;
+            }
+        } else if (parametro instanceof String && "?".equals(parametro)) {
+            // Endereço desconhecido, armazenar na pilha
+            pilha[++topo] = parametro;
             ponteiro++;
+        } else {
+            throw new RuntimeException("Tipo inválido de parâmetro para operação JMF: " + parametro.getClass().getName());
         }
     }
 
-    private void executarJMP(int endereco) {
-        ponteiro = endereco;
+    private void executarJMP(Object parametro) {
+        if (parametro instanceof Integer) {
+            int endereco = (Integer) parametro;
+            ponteiro = endereco;
+        } else if (parametro instanceof String && "?".equals(parametro)) {
+            // Endereço desconhecido, armazenar na pilha
+            pilha[++topo] = parametro;
+            ponteiro++;
+        } else {
+            throw new RuntimeException("Tipo inválido de parâmetro para operação JMP: " + parametro.getClass().getName());
+        }
     }
-
     private void executarJMT(int endereco) {
         if ((int)pilha[topo--] != 0) {
             ponteiro = endereco;
@@ -291,8 +311,18 @@ public class AMaquinaVirtual {
         ponteiro++;
     }
 
-    private void executarLDB(int constante) {
-        pilha[++topo] = constante;
+    private void executarLDB(Object constante) {
+        if (constante instanceof Integer) {
+            pilha[++topo] = constante;
+        } else if (constante instanceof Double) {
+            pilha[++topo] = constante;
+        } else if (constante instanceof String) {
+            pilha[++topo] = constante;
+        } else if (constante instanceof Boolean) {
+            pilha[++topo] = (Boolean) constante ? 1 : 0; // Representar booleano como 1 ou 0
+        } else {
+            throw new RuntimeException("Tipo inválido na pilha para operação LDB: " + constante.getClass().getName());
+        }
         ponteiro++;
     }
 
@@ -416,15 +446,30 @@ public class AMaquinaVirtual {
         }
 
     private void executarREA() {
-        int valor = controller.solicitarEntrada();
+        // int valor = controller.solicitarEntrada();
+        int valor = 0;
         pilha[++topo] = valor;
         ponteiro++;
     }
 
     private void executarWRT() {
-        String mensagem = String.valueOf(pilha[topo]);
-        controller.exibirMensagem(mensagem.toString().trim());
-        topo--;
+        if (topo < 0) {
+            throw new RuntimeException("Pilha vazia na operação WRT");
+        }
+        Object valor = pilha[topo--];
+        String mensagem;
+        if (valor instanceof Integer) {
+            mensagem = String.valueOf(valor);
+        } else if (valor instanceof Double) {
+            mensagem = String.valueOf(valor);
+        } else if (valor instanceof String) {
+            mensagem = (String) valor;
+        } else if (valor instanceof Boolean) {
+            mensagem = (Boolean) valor ? "true" : "false";
+        } else {
+            throw new RuntimeException("Tipo inválido na pilha para operação WRT: " + valor.getClass().getName());
+        }
+        controller.exibirMensagem(mensagem);
         ponteiro++;
     }
 

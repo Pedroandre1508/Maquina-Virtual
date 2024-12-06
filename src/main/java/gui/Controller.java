@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -41,6 +42,7 @@ public class Controller {
     private Stage interactionStage;
     private InteractionController interactionController;
     private boolean isInteractionControllerInitialized = false; // Variável de controle
+    private CompletableFuture<String> entradaFuture;
     private EditorFile editorFile = new EditorFile();
     private static boolean hasEditedFile = false;
     private static boolean hasOpenFile = false;
@@ -455,23 +457,27 @@ public class Controller {
     }
 
     public int solicitarEntrada() {
-        //ARRUMAR PARA SOLICITAR ENTRADA DE DADO
-        interactionController.enableInputField(true);
-        synchronized (interactionController) {
-            try {
-                interactionController.wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+        // Abrir a janela de interação se não estiver inicializada
         if (!isInteractionControllerInitialized) {
-            abrirJanelaInteracao(); // Inicializar se não estiver inicializado
+            abrirJanelaInteracao();
         }
-        interactionController.enableInputField(false);
-        
-        int valor = Integer.parseInt(interactionController.getInputValue());
-        System.out.println("Valor lido: " + valor);
-        return Integer.parseInt(interactionController.getInputValue());
+        interactionController.enableInputField(true);
+        entradaFuture = new CompletableFuture<>();
+        try {
+            String valor = entradaFuture.get(); // Aguarda a entrada do usuário
+            interactionController.enableInputField(false);
+            System.out.println("Valor lido: " + valor);
+            return Integer.parseInt(valor);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1; // Retorna um valor padrão em caso de erro
+        }
+    }
+
+    public void entradaRecebida(String valor) {
+        if (entradaFuture != null) {
+            entradaFuture.complete(valor);
+        }
     }
 
     public void exibirMensagem(String mensagem) {

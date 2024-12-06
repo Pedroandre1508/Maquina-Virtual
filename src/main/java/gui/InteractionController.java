@@ -21,6 +21,7 @@ public class InteractionController {
 
     private Stage stage;
     private String inputValue;
+    private Controller controller;
 
     public void initialize() {
         // Adiciona um manipulador de eventos para a tecla "Enter" no campo de texto
@@ -41,6 +42,10 @@ public class InteractionController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
     }
 
     public String getInputValue() {
@@ -67,8 +72,8 @@ public class InteractionController {
         }
         setMessage(inputValue);
         inputTextField.clear();
-        synchronized (this) {
-            this.notify();
+        if (controller != null) {
+            controller.entradaRecebida(inputValue);
         }
     }
 }

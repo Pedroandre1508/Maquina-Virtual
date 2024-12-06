@@ -461,9 +461,6 @@ public void acao12(String identificador) throws SemanticException {
 
     // Ação #21: reconhecimento de expressão em comando de seleção
     public void acao21() throws SemanticException {
-        if (tipo != 4) { // Verificar se o tipo é lógico
-            semanticErrors.add(new SemanticException("Erro Semantico: expressão deve ser lógica em comando de seleção", token.beginLine, token.beginColumn));
-        }
         gerarInstrucao(ponteiro, "JMF", "?");
         ponteiro++;
         pilhaDesvios.add(ponteiro - 1);
@@ -501,9 +498,6 @@ public void acao12(String identificador) throws SemanticException {
 
     // Ação #25: reconhecimento de expressão em comando de repetição
     public void acao25() {
-        if (tipo != 4) { // Verificar se o tipo é lógico
-            semanticErrors.add(new SemanticException("Erro Semantico: expressão deve ser lógica em comando de repetição", token.beginLine, token.beginColumn));
-        }
         gerarInstrucao(ponteiro, "JMF", "?");
         ponteiro++;
         pilhaDesvios.add(ponteiro - 1);
@@ -1199,6 +1193,8 @@ public void acao12(String identificador) throws SemanticException {
         }
     }
 
+    private int tipoExpressao; // Variável para armazenar o tipo do primeiro elemento na expressão
+
     final public void expressao() throws ParseException, SemanticException {
         trace_call("expressao");
         try {
@@ -1213,7 +1209,9 @@ public void acao12(String identificador) throws SemanticException {
     final public void expressao_prime() throws ParseException, SemanticException {
         trace_call("expressao_prime");
         try {
-
+            if (!verificarCompatibilidade(tipoExpressao, tipoAtribuicao)) {
+                throw new SemanticException("Erro Semantico: tipo incompatível na expressão", token.beginLine, token.beginColumn);
+            }
             switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
                 case IGUAL:
                 case DIFERENTE:
@@ -1409,6 +1407,7 @@ public void acao12(String identificador) throws SemanticException {
         try {
 
             elemento();
+            tipoExpressao = tipoAtribuicao; // Armazenar o tipo do primeiro elemento
             maior_prioridade();
         } finally {
             trace_return("termo1");

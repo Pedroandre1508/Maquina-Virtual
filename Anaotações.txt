@@ -21,6 +21,14 @@ put(x, y, z).
 end.
 
 
+make programa
+
+const int: a = 10. real: b = 20. end;
+var int: x, y. real: z. end;
+get(x).
+put(x).
+end.
+
 ---------------
 make programa
 
