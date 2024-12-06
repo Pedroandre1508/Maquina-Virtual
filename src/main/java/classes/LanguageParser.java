@@ -1448,7 +1448,7 @@ public void acao12(String identificador) throws SemanticException {
                     if (simbolo == null) {
                         throw new SemanticException("Símbolo não declarado: " + token.image, token.beginLine, token.beginColumn);
                     }
-                    tipoAtribuicao = simbolo.getAtributo(); // Armazenar o tipo do símbolo
+                    tipoAtribuicao = simbolo.getCategoria(); // Armazenar o tipo do símbolo
                     acao15(token.image);
                     break;
                 }
