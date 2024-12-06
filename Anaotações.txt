@@ -16,6 +16,7 @@ make programa
 
 const int: a = 10. real: b = 20. end;
 var int: x, y. real: z. end;
+10->x.
 put(x, y, z).
 end.
 

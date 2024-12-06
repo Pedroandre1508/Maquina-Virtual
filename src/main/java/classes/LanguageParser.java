@@ -363,9 +363,9 @@ public class LanguageParser implements LanguageParserConstants {
         if (tabelaSimbolos.contains(identificador)) {
             Simbolo simbolo = tabelaSimbolos.getSimbolo(identificador);
             // Verificar se o identificador é um identificador de variável
-            if (simbolo.getCategoria() >= 1 && simbolo.getCategoria() <= 4) { // Tipos 1 a 4 são variáveis
+            if (simbolo.getCategoria() > 0 && simbolo.getCategoria() < 5) { // Tipos 1 a 4 variavel 
                 // Verificar compatibilidade de tipos
-                if (tipo == simbolo.getAtributo() || (simbolo.getAtributo() == 2 && tipo == 1)) { // Real pode receber inteiro
+                if (simbolo.getCategoria() == 1 || (simbolo.getCategoria() == 2 && simbolo.getCategoria() == 1)) { // Real pode receber inteiro
                     gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
                     ponteiro++;
                 } else {
@@ -548,7 +548,7 @@ public class LanguageParser implements LanguageParserConstants {
 
     // Ação #33: reconhecimento de operação aritmética adição
     public void acao33() {
-        if (tipo != 1 && tipo != 2) { // Verificar se os operandos são inteiros ou reais
+        if (token.kind != CONSTANTE_INTEIRA && token.kind != CONSTANTE_REAL) { // Verificar se os operandos são inteiros ou reais
             semanticErrors.add(new SemanticException("Erro Semantico: operadores aritméticos devem ser inteiros ou reais", token.beginLine, token.beginColumn));
         }
         gerarInstrucao(ponteiro, "ADD", 0);
@@ -580,6 +580,9 @@ public class LanguageParser implements LanguageParserConstants {
     public void acao37() {
         if (tipo != 1 && tipo != 2) { // Verificar se os operandos são inteiros ou reais
             semanticErrors.add(new SemanticException("Erro Semantico: operadores aritméticos devem ser inteiros ou reais", token.beginLine, token.beginColumn));
+        }
+        if("0".equals(token.image)){
+            semanticErrors.add(new SemanticException("Erro Semantico: Divisão por zero", token.beginLine, token.beginColumn));
         }
         gerarInstrucao(ponteiro, "DIV", 0);
         ponteiro++;
@@ -618,6 +621,22 @@ public class LanguageParser implements LanguageParserConstants {
     // Método auxiliar para gerar instruções
     private void gerarInstrucao(int ponteiro, String instrucao, Object operando) {
         tabelaInstrucoes.adicionarInstrucao(ponteiro, instrucao, operando);
+    }
+
+    private boolean verificarCompatibilidade(int tipoAtribuicao) {
+        // Verificar se o tipo do token é compatível com o tipo da atribuição
+        switch (tipoAtribuicao) {
+            case 1: // Inteiro
+                return token.kind == CONSTANTE_INTEIRA;
+            case 2: // Real
+                return token.kind == CONSTANTE_REAL;
+            case 3: // Literal
+                return token.kind == CONSTANTE_LITERAL;
+            case 4: // Booleano
+                return token.kind == TRUE || token.kind == FALSE;
+            default:
+                return false;
+        }
     }
 
     // Analisador Sintatico
@@ -1080,13 +1099,14 @@ public class LanguageParser implements LanguageParserConstants {
                 }
                 case CONSTANTE_REAL: {
                     jj_consume_token(CONSTANTE_REAL);
-                    acao17(tipo);
+                    double constantereal = Double.parseDouble(token.image);
+                    acao17(constantereal);
                     break;
                 }
                 case CONSTANTE_LITERAL: {
                     jj_consume_token(CONSTANTE_LITERAL);
-                    //verificar
-                    acao18(token.image);
+                    String constanteLiteral = String.valueOf(token.image);
+                    acao18(constanteLiteral);
                     break;
                 }
                 case TRUE: {
@@ -1405,40 +1425,60 @@ public class LanguageParser implements LanguageParserConstants {
     final public void elemento() throws ParseException, SemanticException {
         trace_call("elemento");
         try {
-
             switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
                 case IDENTIFICADOR: {
                     identificador();
+                    Simbolo simbolo = tabelaSimbolos.getSimbolo(token.image);
+                    if (simbolo == null) {
+                        throw new SemanticException("Símbolo não declarado: " + token.image, token.beginLine, token.beginColumn);
+                    }
                     //verificar
                     acao15(token.image);
                     break;
                 }
                 case CONSTANTE_INTEIRA: {
                     jj_consume_token(CONSTANTE_INTEIRA);
-                    //verificar
                     int constanteInteira = Integer.parseInt(token.image);
+                    // Verificar compatibilidade de tipos
+                    if (!verificarCompatibilidade(1)) {
+                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado inteiro mas encontrado " + token.image, token.beginLine, token.beginColumn);
+                    }
                     acao16(constanteInteira);
                     break;
                 }
                 case CONSTANTE_REAL: {
                     jj_consume_token(CONSTANTE_REAL);
-                    //verificar
-                    acao17(tipo);
+                    double constanteReal = Double.parseDouble(token.image);
+                    // Verificar compatibilidade de tipos
+                    if (!verificarCompatibilidade(2)) {
+                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado real mas encontrado " + token.image, token.beginLine, token.beginColumn);
+                    }
+                    acao17(constanteReal);
                     break;
                 }
                 case CONSTANTE_LITERAL: {
                     jj_consume_token(CONSTANTE_LITERAL);
-                    //verificar
-                    acao18(token.image);
+                    String constanteLiteral = token.image;
+                    // Verificar compatibilidade de tipos
+                    if (!verificarCompatibilidade(3)) {
+                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado literal mas encontrado " + token.image, token.beginLine, token.beginColumn);
+                    }
+                    acao18(constanteLiteral);
                     break;
                 }
                 case TRUE: {
                     jj_consume_token(TRUE);
+                    if (!verificarCompatibilidade(4)) {
+                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado booleano mas encontrado " + token.image, token.beginLine, token.beginColumn);
+                    }
                     acao19();
                     break;
                 }
                 case FALSE: {
                     jj_consume_token(FALSE);
+                    if (!verificarCompatibilidade(4)) {
+                        throw new SemanticException("Erro Semantico: Tipo incompatível: esperado booleano mas encontrado " + token.image, token.beginLine, token.beginColumn);
+                    }
                     acao20();
                     break;
                 }

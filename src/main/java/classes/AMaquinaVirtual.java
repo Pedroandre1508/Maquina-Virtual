@@ -1,5 +1,7 @@
 package classes;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import gui.Controller;
@@ -132,10 +134,37 @@ public class AMaquinaVirtual {
     // Implementação das instruções
 
     private void executarADD() {
-        pilha[topo - 1] = (int) pilha[topo - 1] + (int) pilha[topo];
-        topo--;
-        ponteiro++;
-    }
+        double valor1 = 0, valor2 = 0;
+        boolean ambosInteiros = true;
+    
+        // Verificar e converter o valor no topo da pilha para double
+        if (pilha[topo] instanceof Integer) {
+            valor2 = ((Integer) pilha[topo]).doubleValue();
+        } else if (pilha[topo] instanceof Double) {
+            valor2 = (Double) pilha[topo];
+            ambosInteiros = false;
+        }
+    
+        // Verificar e converter o valor no topo-1 da pilha para double
+        if (pilha[topo - 1] instanceof Integer) {
+            valor1 = ((Integer) pilha[topo - 1]).doubleValue();
+        } else if (pilha[topo - 1] instanceof Double) {
+            valor1 = (Double) pilha[topo - 1];
+            ambosInteiros = false;
+        }
+    
+         // Realizar a adição
+        double resultado = valor1 + valor2;
+
+        // Verificar se o resultado é um número inteiro
+        if (ambosInteiros || resultado == Math.floor(resultado)) {
+            pilha[topo - 1] = (int) resultado;
+        } else {
+            pilha[topo - 1] = resultado;
+        }
+            topo--;
+            ponteiro++;
+        }
 
     private void executarALB(int deslocamento) {
         for (int i = topo + 1; i <= topo + deslocamento; i++) {
@@ -194,11 +223,39 @@ public class AMaquinaVirtual {
     }
 
     private void executarDIV() {
+        double valor1 = 0, valor2 = 0;
+        boolean ambosInteiros = true;
+
         if ((int) pilha[topo] == 0) {
-            System.out.println("RUNTIME error: divisão por 0");
+            System.out.println("Erro: divisão por 0");
             System.exit(1);
         }
-        pilha[topo - 1] = (int) pilha[topo - 1] / (int) pilha[topo];
+    
+        // Verificar e converter o valor no topo da pilha para double
+        if (pilha[topo] instanceof Integer) {
+            valor2 = ((Integer) pilha[topo]).doubleValue();
+        } else if (pilha[topo] instanceof Double) {
+            valor2 = (Double) pilha[topo];
+            ambosInteiros = false;
+        }
+    
+        // Verificar e converter o valor no topo-1 da pilha para double
+        if (pilha[topo - 1] instanceof Integer) {
+            valor1 = ((Integer) pilha[topo - 1]).doubleValue();
+        } else if (pilha[topo - 1] instanceof Double) {
+            valor1 = (Double) pilha[topo - 1];
+            ambosInteiros = false;
+        }
+    
+        // Realizar a divisão e arredondar o resultado para 4 dígitos após a vírgula
+        BigDecimal resultado = BigDecimal.valueOf(valor1).divide(BigDecimal.valueOf(valor2), 4, RoundingMode.HALF_UP);
+    
+        // Verificar se o resultado é um número inteiro
+        if (resultado.stripTrailingZeros().scale() <= 0) {
+            pilha[topo - 1] = resultado.intValue();
+        } else {
+            pilha[topo - 1] = resultado.doubleValue();
+        }
         topo--;
         ponteiro++;
     }
@@ -255,10 +312,41 @@ public class AMaquinaVirtual {
     }
 
     private void executarMUL() {
-        pilha[topo - 1] = (int)pilha[topo - 1] * (int)pilha[topo];
-        topo--;
-        ponteiro++;
-    }
+        double valor1, valor2;
+        boolean ambosInteiros = true;
+    
+        // Verificar e converter o valor no topo da pilha para double
+        if (pilha[topo] instanceof Integer) {
+            valor2 = ((Integer) pilha[topo]).doubleValue();
+        } else if (pilha[topo] instanceof Double) {
+            valor2 = (Double) pilha[topo];
+            ambosInteiros = false;
+        } else {
+            throw new RuntimeException("Tipo inválido na pilha para operação MUL: " + pilha[topo].getClass().getName());
+        }
+    
+        // Verificar e converter o valor no topo-1 da pilha para double
+        if (pilha[topo - 1] instanceof Integer) {
+            valor1 = ((Integer) pilha[topo - 1]).doubleValue();
+        } else if (pilha[topo - 1] instanceof Double) {
+            valor1 = (Double) pilha[topo - 1];
+            ambosInteiros = false;
+        } else {
+            throw new RuntimeException("Tipo inválido na pilha para operação MUL: " + pilha[topo - 1].getClass().getName());
+        }
+    
+        // Realizar a multiplicação
+        double resultado = valor1 * valor2;
+
+        // Verificar se o resultado é um número inteiro
+        if (ambosInteiros || resultado == Math.floor(resultado)) {
+            pilha[topo - 1] = (int) resultado;
+        } else {
+            pilha[topo - 1] = resultado;
+        }
+            topo--;
+            ponteiro++;
+        }
 
     private void executarNOT() {
         pilha[topo] = ((int)pilha[topo] == 0) ? 1 : 0;
@@ -295,10 +383,37 @@ public class AMaquinaVirtual {
     }
 
     private void executarSUB() {
-        pilha[topo - 1] = (int)pilha[topo - 1] - (int)pilha[topo];
-        topo--;
-        ponteiro++;
-    }
+        double valor1 = 0, valor2 = 0;
+        boolean ambosInteiros = true;
+    
+        // Verificar e converter o valor no topo da pilha para double
+        if (pilha[topo] instanceof Integer) {
+            valor2 = ((Integer) pilha[topo]).doubleValue();
+        } else if (pilha[topo] instanceof Double) {
+            valor2 = (Double) pilha[topo];
+            ambosInteiros = false;
+        }
+    
+        // Verificar e converter o valor no topo-1 da pilha para double
+        if (pilha[topo - 1] instanceof Integer) {
+            valor1 = ((Integer) pilha[topo - 1]).doubleValue();
+        } else if (pilha[topo - 1] instanceof Double) {
+            valor1 = (Double) pilha[topo - 1];
+            ambosInteiros = false;
+        }
+    
+         // Realizar a subtração
+        double resultado = valor1 - valor2;
+
+        // Verificar se o resultado é um número inteiro
+        if (ambosInteiros || resultado == Math.floor(resultado)) {
+            pilha[topo - 1] = (int) resultado;
+        } else {
+            pilha[topo - 1] = resultado;
+        }
+            topo--;
+            ponteiro++;
+        }
 
     private void executarREA() {
         int valor = controller.solicitarEntrada();
