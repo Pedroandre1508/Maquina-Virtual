@@ -359,25 +359,56 @@ public class LanguageParser implements LanguageParserConstants {
     }
 
     // Ação #12: reconhecimento de identificador em comando de atribuição
-    public void acao12(String identificador) throws SemanticException {
-        if (tabelaSimbolos.contains(identificador)) {
-            Simbolo simbolo = tabelaSimbolos.getSimbolo(identificador);
-            // Verificar se o identificador é um identificador de variável
-            if (simbolo.getCategoria() > 0 && simbolo.getCategoria() < 5) { // Tipos 1 a 4 variavel 
-                // Verificar compatibilidade de tipos
-                if (simbolo.getCategoria() == 1 || (simbolo.getCategoria() == 2 && simbolo.getCategoria() == 1)) { // Real pode receber inteiro
-                    gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
-                    ponteiro++;
-                } else {
-                    semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
-                }
-            } else {
-                semanticErrors.add(new SemanticException("Erro Semantico: identificador de programa ou de constante", token.beginLine, token.beginColumn));
+public void acao12(String identificador) throws SemanticException {
+    if (tabelaSimbolos.contains(identificador)) {
+        Simbolo simbolo = tabelaSimbolos.getSimbolo(identificador);
+        // Verificar se o identificador é um identificador de variável
+        if (simbolo.getCategoria() > 0 && simbolo.getCategoria() < 5) { // Tipos 1 a 4 variavel 
+            // Verificar compatibilidade de tipos
+            switch (simbolo.getCategoria()) {
+                case 1: // Inteiro
+                    if (simbolo.getCategoria() == 1) { // Atribuição de inteiro
+                        gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
+                        ponteiro++;
+                    } else {
+                        semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
+                    }
+                    break;
+                case 2: // Real
+                    if (simbolo.getCategoria() == 1 || simbolo.getCategoria() == 2) { // Atribuição de inteiro ou real
+                        gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
+                        ponteiro++;
+                    } else {
+                        semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
+                    }
+                    break;
+                case 3: // Literal
+                    if (simbolo.getCategoria() == 3) { // Atribuição de literal
+                        gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
+                        ponteiro++;
+                    } else {
+                        semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
+                    }
+                    break;
+                case 4: // Booleano
+                    if (simbolo.getCategoria() == 4) { // Atribuição de booleano
+                        gerarInstrucao(ponteiro, "STR", simbolo.getAtributo());
+                        ponteiro++;
+                    } else {
+                        semanticErrors.add(new SemanticException("Erro Semantico: tipo incompatível na atribuição", token.beginLine, token.beginColumn));
+                    }
+                    break;
+                default:
+                    semanticErrors.add(new SemanticException("Erro Semantico: tipo desconhecido", token.beginLine, token.beginColumn));
+                    break;
             }
         } else {
-            semanticErrors.add(new SemanticException("Erro Semantico: identificador não declarado", token.beginLine, token.beginColumn));
+            semanticErrors.add(new SemanticException("Erro Semantico: identificador de programa ou de constante", token.beginLine, token.beginColumn));
         }
+    } else {
+        semanticErrors.add(new SemanticException("Erro Semantico: identificador não declarado", token.beginLine, token.beginColumn));
     }
+}
 
     // Ação #13: reconhecimento da palavra reservada get
     public void acao13() {
